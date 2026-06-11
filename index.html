@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Para Você — Nossa História</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -590,6 +590,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: max(4.5rem, calc(env(safe-area-inset-top) + 3rem)) 1.25rem max(1.5rem, env(safe-area-inset-bottom));
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.5s var(--ease-out);
@@ -603,7 +604,11 @@
     .lightbox-content {
       text-align: center;
       max-width: 560px;
-      padding: 2rem;
+      width: 100%;
+      max-height: 100%;
+      padding: 0 0.5rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       transform: scale(0.9);
       transition: transform 0.5s var(--ease-out);
     }
@@ -635,23 +640,52 @@
     }
 
     .lightbox-close {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      background: none;
+      position: fixed;
+      top: max(1rem, env(safe-area-inset-top));
+      right: max(1rem, env(safe-area-inset-right));
+      z-index: 2001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 14, 26, 0.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--glass-border);
-      color: var(--white-muted);
-      width: 44px;
-      height: 44px;
+      color: var(--white);
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 1.2rem;
-      transition: border-color 0.3s, color 0.3s;
+      font-size: 1.5rem;
+      line-height: 1;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      transition: border-color 0.3s, color 0.3s, background 0.3s;
     }
 
-    .lightbox-close:hover {
+    .lightbox-close:hover,
+    .lightbox-close:active {
       border-color: var(--love);
       color: var(--love);
+      background: rgba(10, 14, 26, 0.95);
+    }
+
+    .lightbox-close-bottom {
+      display: none;
+      margin: 1.5rem auto 0;
+      padding: 0.85rem 2rem;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ═══════════════════════════════════════════
@@ -1051,6 +1085,28 @@
       .letter-paper::before {
         left: 1.5rem;
       }
+
+      .lightbox {
+        padding-top: max(5rem, calc(env(safe-area-inset-top) + 3.5rem));
+      }
+
+      .lightbox-close {
+        width: 52px;
+        height: 52px;
+        font-size: 1.6rem;
+      }
+
+      .lightbox-image {
+        max-height: 45vh;
+      }
+
+      .lightbox-content h3 {
+        font-size: 1.5rem;
+      }
+
+      .lightbox-close-bottom {
+        display: block;
+      }
     }
 
     /* Reduzir animações para acessibilidade */
@@ -1238,6 +1294,7 @@
         <img class="lightbox-image" id="lightbox-image" src="" alt="">
         <h3 id="lightbox-title"></h3>
         <p id="lightbox-desc"></p>
+        <button class="lightbox-close-bottom" id="lightbox-close-bottom" type="button">Fechar</button>
       </div>
     </div>
 
@@ -1512,6 +1569,8 @@ Feliz Dia dos Namorados. Hoje e sempre.`
     const lightboxTitle = document.getElementById('lightbox-title');
     const lightboxDesc = document.getElementById('lightbox-desc');
     const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxCloseBottom = document.getElementById('lightbox-close-bottom');
+    const lightboxContent = lightbox.querySelector('.lightbox-content');
 
     document.querySelectorAll('.gallery-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -1530,7 +1589,20 @@ Feliz Dia dos Namorados. Hoje e sempre.`
       document.body.style.overflow = '';
     }
 
-    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLightbox();
+    });
+
+    lightboxCloseBottom.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      closeLightbox();
+    });
+
+    lightboxContent.addEventListener('click', (e) => e.stopPropagation());
+
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox) closeLightbox();
     });
